@@ -22,4 +22,7 @@
   .border-border {
     border-color: rgb(229 231 235);
   }
+  .section-title { @apply font-display text-3xl sm:text-4xl font-bold text-gray-900 tracking-tight; }
+  .section-subtitle { @apply text-gray-500 text-lg mt-3 max-w-2xl; }
+  .badge-pill { @apply inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1 rounded-full; }
 }

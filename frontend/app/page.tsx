@@ -7,11 +7,9 @@ import type { Template } from '@/lib/types'
 async function getTrendingTemplates(): Promise<Template[]> {
   try {
     const apiUrl = process.env.NEXT_PUBLIC_API_URL
-    if (!apiUrl) throw new Error('No API URL configured')
-    const res = await fetch(`${apiUrl}/api/templates?page=1&per_page=8`, {
-      next: { revalidate: 3600 },
-    })
-    if (!res.ok) throw new Error('API unavailable')
+    if (!apiUrl) throw new Error('no api')
+    const res = await fetch(`${apiUrl}/api/templates?page=1&per_page=8`, { next: { revalidate: 3600 } })
+    if (!res.ok) throw new Error('api error')
     const data = await res.json() as { items: Template[] }
     return data.items?.length ? data.items : MOCK_TEMPLATES.slice(0, 8)
   } catch {
@@ -23,134 +21,177 @@ export default async function HomePage() {
   const trendingTemplates = await getTrendingTemplates()
 
   return (
-    <div>
+    <div className="bg-white">
       {/* Hero */}
-      <section className="relative bg-gradient-to-br from-indigo-50 via-white to-violet-50 pt-16 pb-24 px-4">
-        <div className="max-w-5xl mx-auto text-center">
-          <div className="inline-flex items-center gap-2 bg-indigo-100 text-brand-indigo text-sm font-medium px-4 py-1.5 rounded-full mb-6">
-            ✨ AI-Powered Invitation Cards
-          </div>
-          <h1 className="font-display text-5xl sm:text-6xl lg:text-7xl font-bold text-gray-900 leading-tight">
-            Create Beautiful<br />
-            <span className="text-gradient">Digital Invitations</span><br />
-            in Minutes
-          </h1>
-          <p className="mt-6 text-xl text-gray-500 max-w-2xl mx-auto leading-relaxed">
-            AI-generated invitation cards for every Indian occasion. Customise, download free watermarked, or get HD starting at{' '}
-            <strong className="text-gray-700">₹29</strong>.
-          </p>
-          <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
-            <Link
-              href="/occasions"
-              className="inline-flex items-center justify-center gap-2 bg-brand-indigo text-white px-8 py-4 rounded-btn text-lg font-semibold hover:bg-brand-violet transition-colors shadow-lg hover:shadow-xl"
-            >
-              Browse Templates →
-            </Link>
-            <Link
-              href="/pricing"
-              className="inline-flex items-center justify-center gap-2 bg-white text-brand-indigo border-2 border-brand-indigo px-8 py-4 rounded-btn text-lg font-semibold hover:bg-indigo-50 transition-colors"
-            >
-              See Pricing
-            </Link>
-          </div>
-          <div className="mt-10 flex flex-wrap items-center justify-center gap-6 text-sm text-gray-400">
-            <span>⭐ 4.9/5 rating</span>
-            <span>👥 50,000+ invitations created</span>
-            <span>⚡ Free to start</span>
+      <section className="relative overflow-hidden bg-[#FAFAFA] border-b border-gray-100">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 lg:py-28">
+          <div className="max-w-3xl">
+            <div className="inline-flex items-center gap-2 bg-indigo-50 text-brand-indigo text-xs font-semibold px-3 py-1.5 rounded-full mb-6 tracking-wide uppercase">
+              AI-Powered · Made for India
+            </div>
+            <h1 className="font-display text-5xl sm:text-6xl lg:text-7xl font-bold text-gray-950 leading-[1.05] tracking-tight">
+              Beautiful invitations<br />
+              <span className="text-brand-indigo">for every occasion</span>
+            </h1>
+            <p className="mt-6 text-xl text-gray-500 leading-relaxed max-w-xl">
+              AI-generated invitation cards for weddings, birthdays, festivals, and 25+ more Indian occasions. Customise in minutes, share instantly.
+            </p>
+            <div className="mt-8 flex flex-wrap gap-3">
+              <Link
+                href="/occasions"
+                className="inline-flex items-center gap-2 bg-brand-indigo text-white px-6 py-3 rounded-lg text-sm font-semibold hover:bg-brand-violet transition-colors shadow-sm"
+              >
+                Browse templates
+                <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
+              </Link>
+              <Link
+                href="/pricing"
+                className="inline-flex items-center gap-2 bg-white text-gray-700 border border-gray-200 px-6 py-3 rounded-lg text-sm font-semibold hover:border-gray-300 hover:bg-gray-50 transition-colors"
+              >
+                View pricing
+              </Link>
+            </div>
+            <div className="mt-10 flex flex-wrap gap-6 text-sm text-gray-400">
+              <span className="flex items-center gap-1.5"><span className="text-emerald-500">✓</span> Free watermarked preview</span>
+              <span className="flex items-center gap-1.5"><span className="text-emerald-500">✓</span> HD from ₹29</span>
+              <span className="flex items-center gap-1.5"><span className="text-emerald-500">✓</span> Share on WhatsApp</span>
+            </div>
           </div>
         </div>
+        {/* Decorative background */}
+        <div className="hidden lg:block absolute right-0 top-0 w-1/2 h-full bg-gradient-to-l from-indigo-50/60 to-transparent pointer-events-none" />
       </section>
 
-      {/* Occasion Grid */}
-      <section className="max-w-7xl mx-auto px-4 py-16">
-        <div className="text-center mb-10">
-          <h2 className="font-display text-3xl font-bold text-gray-900">Browse by Occasion</h2>
-          <p className="text-gray-500 mt-2">28+ occasion categories · 200+ AI-generated templates</p>
-        </div>
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-          {OCCASIONS.slice(0, 20).map((occ) => (
-            <Link
-              key={occ.slug}
-              href={`/occasions/${occ.slug}`}
-              className="group flex flex-col items-center gap-2 p-4 bg-white rounded-card border border-gray-100 hover:border-brand-indigo hover:shadow-card-hover transition-all duration-200"
-            >
-              <div className="text-4xl">{occ.emoji}</div>
-              <p className="text-sm font-medium text-gray-700 text-center group-hover:text-brand-indigo">
-                {occ.label}
-              </p>
-            </Link>
-          ))}
-        </div>
-        <div className="text-center mt-6">
-          <Link href="/occasions" className="text-brand-indigo font-medium hover:underline text-sm">
-            View all 28 occasions →
-          </Link>
-        </div>
-      </section>
-
-      {/* How it works */}
-      <section className="bg-gray-50 py-16 px-4">
-        <div className="max-w-4xl mx-auto text-center">
-          <h2 className="font-display text-3xl font-bold text-gray-900 mb-10">How It Works</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+      {/* Social proof bar */}
+      <div className="border-b border-gray-100 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5">
+          <div className="flex flex-wrap items-center justify-center gap-8 sm:gap-16 text-center">
             {[
-              { step: '01', icon: '🔍', title: 'Browse Templates', desc: 'Choose from 200+ AI-generated designs across 28 occasion categories' },
-              { step: '02', icon: '✏️', title: 'Customise', desc: 'Edit text, change colours, upload your photo — all in our easy browser editor' },
-              { step: '03', icon: '📱', title: 'Download & Share', desc: 'Free watermarked PNG instantly. Pay ₹29–149 for HD, share via WhatsApp' },
-            ].map(({ step, icon, title, desc }) => (
-              <div key={step} className="flex flex-col items-center text-center">
-                <div className="w-16 h-16 bg-brand-indigo/10 rounded-2xl flex items-center justify-center text-3xl mb-4">
-                  {icon}
-                </div>
-                <span className="text-xs font-bold text-brand-indigo uppercase tracking-widest mb-1">
-                  Step {step}
-                </span>
-                <h3 className="font-semibold text-gray-900 text-lg mb-2">{title}</h3>
-                <p className="text-gray-500 text-sm leading-relaxed">{desc}</p>
+              { num: '50,000+', label: 'Invitations created' },
+              { num: '28+', label: 'Occasion types' },
+              { num: '200+', label: 'AI templates' },
+              { num: '4.9/5', label: 'Customer rating' },
+            ].map(({ num, label }) => (
+              <div key={label}>
+                <div className="text-2xl font-bold text-gray-900 font-display">{num}</div>
+                <div className="text-xs text-gray-400 mt-0.5 uppercase tracking-wider">{label}</div>
               </div>
             ))}
           </div>
+        </div>
+      </div>
+
+      {/* Occasions */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+        <div className="flex items-end justify-between mb-10">
+          <div>
+            <h2 className="font-display text-3xl font-bold text-gray-900 tracking-tight">Browse by occasion</h2>
+            <p className="text-gray-500 mt-2">28 categories · hundreds of templates</p>
+          </div>
+          <Link href="/occasions" className="hidden sm:block text-sm font-medium text-brand-indigo hover:underline">
+            View all →
+          </Link>
+        </div>
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3">
+          {OCCASIONS.slice(0, 18).map((occ) => (
+            <Link
+              key={occ.slug}
+              href={`/occasions/${occ.slug}`}
+              className="group flex flex-col items-center gap-2.5 p-4 bg-white rounded-xl border border-gray-100 hover:border-brand-indigo/30 hover:bg-indigo-50/30 hover:shadow-sm transition-all duration-200"
+            >
+              <span className="text-3xl leading-none">{occ.emoji}</span>
+              <span className="text-xs font-medium text-gray-600 text-center group-hover:text-brand-indigo leading-tight">
+                {occ.label}
+              </span>
+            </Link>
+          ))}
+        </div>
+        <div className="text-center mt-6 sm:hidden">
+          <Link href="/occasions" className="text-sm font-medium text-brand-indigo hover:underline">View all 28 occasions →</Link>
         </div>
       </section>
 
       {/* Trending Templates */}
-      <section className="max-w-7xl mx-auto px-4 py-16">
-        <div className="flex items-center justify-between mb-8">
-          <h2 className="font-display text-3xl font-bold text-gray-900">Trending Templates</h2>
-          <Link href="/occasions" className="text-brand-indigo font-medium hover:underline text-sm">
-            View all →
-          </Link>
+      <section className="bg-gray-50 border-y border-gray-100 py-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-end justify-between mb-10">
+            <div>
+              <h2 className="font-display text-3xl font-bold text-gray-900 tracking-tight">Trending templates</h2>
+              <p className="text-gray-500 mt-2">Our most-loved designs this week</p>
+            </div>
+            <Link href="/occasions" className="hidden sm:block text-sm font-medium text-brand-indigo hover:underline">
+              See all →
+            </Link>
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 lg:gap-5">
+            {trendingTemplates.map(template => (
+              <TemplateCard key={template.id} template={template} />
+            ))}
+          </div>
         </div>
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-          {trendingTemplates.map(template => (
-            <TemplateCard key={template.id} template={template} />
+      </section>
+
+      {/* How it works */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+        <div className="text-center mb-14">
+          <h2 className="font-display text-3xl font-bold text-gray-900 tracking-tight">How it works</h2>
+          <p className="text-gray-500 mt-2">From blank to beautiful in three steps</p>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 lg:gap-12">
+          {[
+            {
+              n: '1',
+              title: 'Choose a template',
+              desc: 'Browse 200+ AI-generated designs across 28 occasion categories. Filter by style, colour, and orientation.',
+            },
+            {
+              n: '2',
+              title: 'Customise it',
+              desc: 'Edit names, dates, and venues. Change colours and fonts. Let AI write personalised invitation text for you.',
+            },
+            {
+              n: '3',
+              title: 'Download and share',
+              desc: 'Get a free watermarked PNG instantly. Pay ₹29–149 for HD quality, then share directly on WhatsApp.',
+            },
+          ].map(({ n, title, desc }) => (
+            <div key={n} className="relative">
+              <div className="flex items-center gap-4 mb-4">
+                <div className="w-10 h-10 rounded-full bg-brand-indigo text-white text-sm font-bold flex items-center justify-center shrink-0">
+                  {n}
+                </div>
+                <div className="h-px flex-1 bg-gray-200 hidden md:block" />
+              </div>
+              <h3 className="font-semibold text-gray-900 text-lg mb-2">{title}</h3>
+              <p className="text-gray-500 text-sm leading-relaxed">{desc}</p>
+            </div>
           ))}
         </div>
       </section>
 
-      {/* Trust CTA */}
-      <section className="bg-gradient-to-r from-brand-indigo to-brand-violet py-16 px-4 text-white text-center">
-        <div className="max-w-3xl mx-auto">
-          <h2 className="font-display text-3xl font-bold mb-4">India&apos;s Favourite Invitation Platform</h2>
-          <p className="text-indigo-200 mb-8">Trusted by families, event planners, and businesses across India</p>
-          <div className="grid grid-cols-3 gap-8 mb-8">
-            {[
-              { num: '50,000+', label: 'Invitations Created' },
-              { num: '₹29', label: 'Starting Price' },
-              { num: '28+', label: 'Occasion Types' },
-            ].map(({ num, label }) => (
-              <div key={label}>
-                <div className="text-3xl font-bold">{num}</div>
-                <div className="text-indigo-200 text-sm mt-1">{label}</div>
-              </div>
-            ))}
+      {/* Bottom CTA */}
+      <section className="bg-gray-950 text-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 text-center">
+          <h2 className="font-display text-4xl font-bold mb-4 tracking-tight">
+            Ready to create your invitation?
+          </h2>
+          <p className="text-gray-400 text-lg mb-8 max-w-xl mx-auto">
+            Join 50,000+ families across India who trust InviteAI for their celebrations.
+          </p>
+          <div className="flex flex-wrap gap-3 justify-center">
+            <Link
+              href="/occasions"
+              className="inline-flex items-center gap-2 bg-white text-gray-900 px-6 py-3 rounded-lg text-sm font-semibold hover:bg-gray-100 transition-colors"
+            >
+              Start for free
+            </Link>
+            <Link
+              href="/pricing"
+              className="inline-flex items-center gap-2 border border-gray-700 text-gray-300 px-6 py-3 rounded-lg text-sm font-semibold hover:border-gray-500 hover:text-white transition-colors"
+            >
+              See pricing
+            </Link>
           </div>
-          <Link
-            href="/occasions"
-            className="inline-flex items-center gap-2 bg-white text-brand-indigo px-8 py-3 rounded-btn font-semibold hover:bg-indigo-50 transition-colors"
-          >
-            Start Creating →
-          </Link>
         </div>
       </section>
     </div>
