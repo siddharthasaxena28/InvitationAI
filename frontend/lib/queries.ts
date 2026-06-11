@@ -11,10 +11,12 @@ export function useTemplates(filters: TemplateFilters = {}) {
       try {
         return await fetchTemplates(filters as Record<string, string | number>)
       } catch {
-        const filtered = MOCK_TEMPLATES.filter(t =>
-          !filters.occasion || t.occasion_slug === filters.occasion
-        )
-        return { items: filtered, total: filtered.length, page: 1, per_page: 20 }
+        // Filter by occasion if specified; fall back to all mock templates if none match
+        const byOccasion = filters.occasion
+          ? MOCK_TEMPLATES.filter(t => t.occasion_slug === filters.occasion)
+          : MOCK_TEMPLATES
+        const items = byOccasion.length > 0 ? byOccasion : MOCK_TEMPLATES.slice(0, 12)
+        return { items, total: items.length, page: 1, per_page: 20 }
       }
     },
     staleTime: 5 * 60 * 1000,

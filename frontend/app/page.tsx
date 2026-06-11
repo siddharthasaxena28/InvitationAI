@@ -6,13 +6,14 @@ import type { Template } from '@/lib/types'
 
 async function getTrendingTemplates(): Promise<Template[]> {
   try {
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL
+    if (!apiUrl) throw new Error('No API URL configured')
     const res = await fetch(`${apiUrl}/api/templates?page=1&per_page=8`, {
       next: { revalidate: 3600 },
     })
     if (!res.ok) throw new Error('API unavailable')
     const data = await res.json() as { items: Template[] }
-    return data.items || []
+    return data.items?.length ? data.items : MOCK_TEMPLATES.slice(0, 8)
   } catch {
     return MOCK_TEMPLATES.slice(0, 8)
   }
@@ -113,21 +114,19 @@ export default async function HomePage() {
       </section>
 
       {/* Trending Templates */}
-      {trendingTemplates.length > 0 && (
-        <section className="max-w-7xl mx-auto px-4 py-16">
-          <div className="flex items-center justify-between mb-8">
-            <h2 className="font-display text-3xl font-bold text-gray-900">Trending Templates</h2>
-            <Link href="/occasions" className="text-brand-indigo font-medium hover:underline text-sm">
-              View all →
-            </Link>
-          </div>
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-            {trendingTemplates.map(template => (
-              <TemplateCard key={template.id} template={template} />
-            ))}
-          </div>
-        </section>
-      )}
+      <section className="max-w-7xl mx-auto px-4 py-16">
+        <div className="flex items-center justify-between mb-8">
+          <h2 className="font-display text-3xl font-bold text-gray-900">Trending Templates</h2>
+          <Link href="/occasions" className="text-brand-indigo font-medium hover:underline text-sm">
+            View all →
+          </Link>
+        </div>
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+          {trendingTemplates.map(template => (
+            <TemplateCard key={template.id} template={template} />
+          ))}
+        </div>
+      </section>
 
       {/* Trust CTA */}
       <section className="bg-gradient-to-r from-brand-indigo to-brand-violet py-16 px-4 text-white text-center">
