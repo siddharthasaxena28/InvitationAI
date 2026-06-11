@@ -4,6 +4,7 @@ export default createMiddleware({
   locales: ['en', 'hi'],
   defaultLocale: 'en',
   localeDetection: false,
+  localePrefix: 'never', // keep URLs as-is — no /en or /hi prefix
 })
 
 export const config = {
