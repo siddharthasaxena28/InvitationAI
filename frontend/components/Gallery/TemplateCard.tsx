@@ -1,3 +1,4 @@
+'use client'
 import Link from 'next/link'
 import { Badge } from '@/components/ui/badge'
 import { formatINR } from '@/lib/utils'
