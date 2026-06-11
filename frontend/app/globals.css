@@ -1,0 +1,25 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --font-inter: 'Inter', sans-serif;
+    --font-playfair: 'Playfair Display', serif;
+  }
+  * {
+    box-sizing: border-box;
+  }
+  body {
+    @apply font-sans text-gray-900 bg-white;
+  }
+}
+
+@layer utilities {
+  .text-gradient {
+    @apply bg-gradient-to-r from-brand-indigo to-brand-violet bg-clip-text text-transparent;
+  }
+  .border-border {
+    border-color: rgb(229 231 235);
+  }
+}

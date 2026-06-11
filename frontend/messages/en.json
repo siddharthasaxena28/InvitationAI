@@ -1,0 +1,87 @@
+{
+  "nav": {
+    "home": "Home",
+    "occasions": "Occasions",
+    "pricing": "Pricing",
+    "about": "About",
+    "login": "Login",
+    "myDesigns": "My Designs"
+  },
+  "home": {
+    "hero": {
+      "title": "Create Beautiful",
+      "titleHighlight": "Digital Invitations",
+      "subtitle": "in Minutes",
+      "description": "AI-powered invitation cards for every occasion. Browse hundreds of templates, customise in seconds, share via WhatsApp.",
+      "cta": "Browse Templates",
+      "ctaSecondary": "See How It Works"
+    },
+    "howItWorks": {
+      "title": "How It Works",
+      "step1Title": "Browse Templates",
+      "step1Desc": "Choose from hundreds of AI-generated designs for every occasion",
+      "step2Title": "Customise",
+      "step2Desc": "Edit text, colours, and photos in our easy drag-and-drop editor",
+      "step3Title": "Download & Share",
+      "step3Desc": "Share instantly via WhatsApp or download as HD PNG/PDF"
+    },
+    "trending": "Trending Templates",
+    "occasions": "Browse by Occasion",
+    "trust": {
+      "templates": "Templates Created",
+      "rating": "Average Rating",
+      "happy": "Happy Customers"
+    }
+  },
+  "editor": {
+    "downloadFree": "Download Free",
+    "downloadHd": "Download HD",
+    "magicCopy": "Magic Copy (AI)",
+    "undo": "Undo",
+    "redo": "Redo",
+    "layers": "Layers",
+    "fonts": "Fonts",
+    "colors": "Colors",
+    "whatsappPreview": "WhatsApp Preview",
+    "addText": "Add Text",
+    "addPhoto": "Add Photo"
+  },
+  "checkout": {
+    "title": "Complete Your Purchase",
+    "free": "Free",
+    "payWith": "Pay with Razorpay",
+    "supportedPayments": "UPI, GPay, PhonePe, Cards, Net Banking",
+    "emailPlaceholder": "Enter your email for receipt"
+  },
+  "download": {
+    "title": "Your Invitation is Ready!",
+    "downloadPng": "Download PNG",
+    "downloadPdf": "Download PDF",
+    "shareWhatsapp": "Share on WhatsApp",
+    "sendEmail": "Send via Email",
+    "editAgain": "Edit Again",
+    "createAnother": "Create Another Invitation"
+  },
+  "pricing": {
+    "title": "Simple, One-Time Pricing",
+    "subtitle": "No subscription. Pay once, download instantly.",
+    "free": "Free",
+    "freeDesc": "Watermarked PNG for WhatsApp sharing",
+    "basic": "Basic",
+    "basicDesc": "HD PNG, no watermark",
+    "standard": "Standard",
+    "standardDesc": "HD PNG + A4 PDF",
+    "premium": "Premium",
+    "premiumDesc": "HD PNG + PDF + 3 sizes",
+    "elite": "Elite",
+    "eliteDesc": "All above + animated GIF"
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "Something went wrong",
+    "retry": "Try Again",
+    "close": "Close",
+    "save": "Save",
+    "cancel": "Cancel"
+  }
+}
