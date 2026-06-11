@@ -1,9 +1,7 @@
 import { notFound } from 'next/navigation'
 import { OCCASIONS } from '@/lib/occasions'
-import { MOCK_TEMPLATES } from '@/lib/mock-data'
 import FilterSidebar from '@/components/Gallery/FilterSidebar'
 import TemplateGrid from '@/components/Gallery/TemplateGrid'
-import type { Template } from '@/lib/types'
 import type { Metadata } from 'next'
 
 interface PageProps {
@@ -24,27 +22,9 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   }
 }
 
-async function getTemplates(slug: string): Promise<Template[]> {
-  try {
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
-    const res = await fetch(`${apiUrl}/api/templates?occasion=${slug}&page=1&per_page=20`, {
-      next: { revalidate: 3600 },
-    })
-    if (!res.ok) throw new Error('API unavailable')
-    const data = await res.json() as { items: Template[] }
-    return data.items || []
-  } catch {
-    return MOCK_TEMPLATES.filter((t) => t.occasion_slug === slug).length > 0
-      ? MOCK_TEMPLATES.filter((t) => t.occasion_slug === slug)
-      : MOCK_TEMPLATES.slice(0, 12)
-  }
-}
-
 export default async function OccasionPage({ params, searchParams }: PageProps) {
   const occ = OCCASIONS.find((o) => o.slug === params.slug)
   if (!occ) notFound()
-
-  const initialTemplates = await getTemplates(params.slug)
 
   return (
     <div>
@@ -73,9 +53,11 @@ export default async function OccasionPage({ params, searchParams }: PageProps) 
           <FilterSidebar />
           <div className="flex-1 min-w-0">
             <TemplateGrid
-              occasionSlug={params.slug}
-              initialTemplates={initialTemplates}
-              searchParams={searchParams}
+              filters={{
+                occasion: params.slug,
+                style: searchParams.style ? [searchParams.style] : undefined,
+                orientation: searchParams.orientation,
+              }}
             />
           </div>
         </div>
