@@ -1,7 +1,5 @@
 import type { Metadata } from 'next'
 import { Inter, Playfair_Display } from 'next/font/google'
-import { NextIntlClientProvider } from 'next-intl'
-import { getMessages } from 'next-intl/server'
 import Providers from '@/components/Providers'
 import Navbar from '@/components/Navigation/Navbar'
 import Footer from '@/components/Navigation/Footer'
@@ -22,19 +20,15 @@ export const metadata: Metadata = {
   },
 }
 
-export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  const messages = await getMessages()
-
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={`${inter.variable} ${playfair.variable}`}>
       <body className="min-h-screen flex flex-col bg-white">
-        <NextIntlClientProvider messages={messages}>
-          <Providers>
-            <Navbar />
-            <main className="flex-1">{children}</main>
-            <Footer />
-          </Providers>
-        </NextIntlClientProvider>
+        <Providers>
+          <Navbar />
+          <main className="flex-1">{children}</main>
+          <Footer />
+        </Providers>
       </body>
     </html>
   )
