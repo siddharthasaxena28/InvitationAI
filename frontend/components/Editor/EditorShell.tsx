@@ -131,7 +131,7 @@ export default function EditorShell({ template }: EditorShellProps) {
               {template.occasion_slug.replace(/-/g, ' ')}
             </p>
           </div>
-          <MagicCopyPanel occasionSlug={template.occasion_slug} />
+          <MagicCopyPanel occasion={template.occasion_slug} canvasRef={canvasRef as React.MutableRefObject<unknown>} />
           <div className="p-4 border-t border-gray-100">
             <Link
               href={`/checkout/${template.id}`}
