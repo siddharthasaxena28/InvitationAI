@@ -9,7 +9,7 @@ interface TemplateGridProps {
 }
 
 export default function TemplateGrid({ filters }: TemplateGridProps) {
-  const { data, isLoading, error } = useTemplates(filters)
+  const { data, isLoading, error, refetch } = useTemplates(filters)
 
   if (isLoading) {
     return (
@@ -27,7 +27,23 @@ export default function TemplateGrid({ filters }: TemplateGridProps) {
     )
   }
 
-  if (error || !data?.items?.length) {
+  if (error) {
+    return (
+      <div className="text-center py-16 text-gray-500">
+        <p className="text-4xl mb-4">⚠️</p>
+        <p className="text-lg font-medium">Failed to load templates</p>
+        <p className="text-sm mt-1 text-gray-400">Check your connection and try again</p>
+        <button
+          onClick={() => refetch()}
+          className="mt-4 text-sm text-indigo-600 hover:underline font-medium"
+        >
+          Retry
+        </button>
+      </div>
+    )
+  }
+
+  if (!data?.items?.length) {
     return (
       <div className="text-center py-16 text-gray-500">
         <p className="text-4xl mb-4">🎨</p>

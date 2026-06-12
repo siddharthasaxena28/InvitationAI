@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState, useCallback, useRef } from 'react'
 import { useParams, useSearchParams } from 'next/navigation'
 import dynamic from 'next/dynamic'
 import Link from 'next/link'
@@ -26,18 +26,26 @@ export default function DownloadPage() {
   const [links, setLinks] = useState<DownloadLinks>({})
   const [windowSize, setWindowSize] = useState({ width: 0, height: 0 })
   const [showConfetti, setShowConfetti] = useState(false)
+  const cancelledRef = useRef(false)
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   useEffect(() => {
+    cancelledRef.current = false
     setWindowSize({ width: window.innerWidth, height: window.innerHeight })
     const handleResize = () => setWindowSize({ width: window.innerWidth, height: window.innerHeight })
     window.addEventListener('resize', handleResize)
-    return () => window.removeEventListener('resize', handleResize)
+    return () => {
+      cancelledRef.current = true
+      if (timeoutRef.current) clearTimeout(timeoutRef.current)
+      window.removeEventListener('resize', handleResize)
+    }
   }, [])
 
   const pollStatus = useCallback(async (taskId: string) => {
     const maxAttempts = 30
     let attempt = 0
     const poll = async () => {
+      if (cancelledRef.current) return
       if (attempt >= maxAttempts) {
         setStatus('error')
         return
@@ -45,18 +53,19 @@ export default function DownloadPage() {
       attempt++
       try {
         const res = await getRenderStatus(taskId)
+        if (cancelledRef.current) return
         if (res.status === 'SUCCESS') {
           setLinks(res.result || {})
           setStatus('done')
           setShowConfetti(true)
-          setTimeout(() => setShowConfetti(false), 5000)
+          timeoutRef.current = setTimeout(() => setShowConfetti(false), 5000)
         } else if (res.status === 'FAILURE') {
           setStatus('error')
         } else {
-          setTimeout(poll, 2000)
+          timeoutRef.current = setTimeout(poll, 2000)
         }
       } catch {
-        setTimeout(poll, 3000)
+        if (!cancelledRef.current) timeoutRef.current = setTimeout(poll, 3000)
       }
     }
     poll()

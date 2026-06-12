@@ -19,22 +19,25 @@ export default function MyDesignsPage() {
       return
     }
     setLoggedIn(true)
+    const controller = new AbortController()
     const fetchOrders = async () => {
       try {
         const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
         const res = await fetch(`${apiUrl}/api/users/me/orders`, {
           headers: { Authorization: `Bearer ${token}` },
+          signal: controller.signal,
         })
         if (!res.ok) throw new Error()
         const data = await res.json() as Order[]
         setOrders(data)
-      } catch {
-        setOrders([])
+      } catch (err) {
+        if ((err as Error).name !== 'AbortError') setOrders([])
       } finally {
         setLoading(false)
       }
     }
     fetchOrders()
+    return () => controller.abort()
   }, [])
 
   if (!loggedIn) {
@@ -97,6 +100,7 @@ export default function MyDesignsPage() {
                 fill
                 className="object-cover"
                 sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none' }}
               />
             </div>
             <div className="p-3">

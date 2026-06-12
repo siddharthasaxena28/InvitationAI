@@ -1,5 +1,5 @@
 'use client'
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 
@@ -17,8 +17,17 @@ export default function MagicCopyPanel({ occasion, canvasRef, onClose }: MagicCo
   const [generating, setGenerating] = useState(false)
   const [generated, setGenerated] = useState('')
   const [parsed, setParsed] = useState<Record<string, string> | null>(null)
+  const abortRef = useRef<AbortController | null>(null)
+
+  useEffect(() => {
+    return () => { abortRef.current?.abort() }
+  }, [])
 
   const generate = async () => {
+    abortRef.current?.abort()
+    const controller = new AbortController()
+    abortRef.current = controller
+
     setGenerating(true)
     setGenerated('')
     setParsed(null)
@@ -35,10 +44,16 @@ export default function MagicCopyPanel({ occasion, canvasRef, onClose }: MagicCo
             venue,
             additional_context: context || null,
           }),
+          signal: controller.signal,
         }
       )
 
-      const reader = res.body!.getReader()
+      const body = res.body
+      if (!body) {
+        setGenerated('Error: No response from server. Please try again.')
+        return
+      }
+      const reader = body.getReader()
       const decoder = new TextDecoder()
       let fullText = ''
       let buffer = ''
@@ -54,8 +69,8 @@ export default function MagicCopyPanel({ occasion, canvasRef, onClose }: MagicCo
             const data = part.slice(6).trim()
             if (data === '[DONE]') continue
             try {
-              const parsed = JSON.parse(data) as { text?: string }
-              fullText += parsed.text || ''
+              const chunk = JSON.parse(data) as { text?: string }
+              fullText += chunk.text || ''
             } catch { /* partial chunk */ }
           }
         }
@@ -64,6 +79,7 @@ export default function MagicCopyPanel({ occasion, canvasRef, onClose }: MagicCo
 
       try { setParsed(JSON.parse(fullText)) } catch { /* not JSON yet */ }
     } catch (err) {
+      if ((err as Error).name === 'AbortError') return
       setGenerated('Error generating copy. Please check your API connection.')
     } finally {
       setGenerating(false)

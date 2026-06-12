@@ -86,8 +86,15 @@ export default function EditorShell({ template }: EditorShellProps) {
   }
 
   const handleDownloadFree = () => {
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
-    window.open(`${apiUrl}/api/render/preview?template_id=${template.id}`, '_blank')
+    if (!canvasRef.current) return
+    const c = canvasRef.current as {
+      toDataURL: (opts?: { format?: string; multiplier?: number }) => string
+    }
+    const dataUrl = c.toDataURL({ format: 'png', multiplier: 1 })
+    const a = document.createElement('a')
+    a.href = dataUrl
+    a.download = `${template.title.replace(/\s+/g, '-')}.png`
+    a.click()
   }
 
   const handleDownloadHd = () => {

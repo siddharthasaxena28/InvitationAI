@@ -1,4 +1,5 @@
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
+const REQUEST_TIMEOUT_MS = 12000
 
 export class ApiError extends Error {
   constructor(public status: number, message: string) {
@@ -8,15 +9,27 @@ export class ApiError extends Error {
 }
 
 export async function apiRequest<T>(path: string, options?: RequestInit): Promise<T> {
-  const res = await fetch(`${BASE_URL}${path}`, {
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    ...options,
-  })
-  if (!res.ok) {
-    const error = await res.json().catch(() => ({}))
-    throw new ApiError(res.status, (error as Record<string, string>).detail || 'Request failed')
+  const controller = new AbortController()
+  const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS)
+
+  try {
+    const res = await fetch(`${BASE_URL}${path}`, {
+      headers: { 'Content-Type': 'application/json', ...options?.headers },
+      signal: controller.signal,
+      ...options,
+    })
+    if (!res.ok) {
+      const error = await res.json().catch(() => ({}))
+      throw new ApiError(res.status, (error as Record<string, string>).detail || 'Request failed')
+    }
+    return res.json() as Promise<T>
+  } catch (err) {
+    if (err instanceof ApiError) throw err
+    if ((err as Error).name === 'AbortError') throw new ApiError(0, 'Request timed out. Please try again.')
+    throw new ApiError(0, 'Network error. Please check your connection.')
+  } finally {
+    clearTimeout(timeoutId)
   }
-  return res.json() as Promise<T>
 }
 
 export async function fetchTemplates(filters: Record<string, string | number | undefined> = {}) {

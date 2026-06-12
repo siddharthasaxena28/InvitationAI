@@ -1,3 +1,4 @@
+import { Suspense } from 'react'
 import { notFound } from 'next/navigation'
 import { OCCASIONS } from '@/lib/occasions'
 import FilterSidebar from '@/components/Gallery/FilterSidebar'
@@ -6,7 +7,7 @@ import type { Metadata } from 'next'
 
 interface PageProps {
   params: { slug: string }
-  searchParams: { style?: string; orientation?: string; sort?: string }
+  searchParams: { style?: string; orientation?: string; sort?: string; price_max?: string }
 }
 
 export async function generateStaticParams() {
@@ -50,13 +51,16 @@ export default async function OccasionPage({ params, searchParams }: PageProps) 
       {/* Content */}
       <div className="max-w-7xl mx-auto px-4 py-8">
         <div className="flex gap-6">
-          <FilterSidebar />
+          <Suspense fallback={<div className="w-64 flex-shrink-0 bg-white border border-gray-200 rounded-2xl h-96 animate-pulse" />}>
+            <FilterSidebar />
+          </Suspense>
           <div className="flex-1 min-w-0">
             <TemplateGrid
               filters={{
                 occasion: params.slug,
                 style: searchParams.style ? [searchParams.style] : undefined,
                 orientation: searchParams.orientation,
+                price_max: searchParams.price_max ? Number(searchParams.price_max) : undefined,
               }}
             />
           </div>

@@ -29,19 +29,29 @@ export default function RazorpayButton({
   const router = useRouter()
   const [loading, setLoading] = useState(false)
   const [scriptLoaded, setScriptLoaded] = useState(false)
+  const [scriptError, setScriptError] = useState(false)
 
   useEffect(() => {
+    // Razorpay script might already be loaded
+    if (window.Razorpay) { setScriptLoaded(true); return }
+
     const script = document.createElement('script')
     script.src = 'https://checkout.razorpay.com/v1/checkout.js'
     script.async = true
     script.onload = () => setScriptLoaded(true)
+    script.onerror = () => {
+      setScriptError(true)
+      onError?.('Payment gateway unavailable. Please refresh and try again.')
+    }
     document.body.appendChild(script)
-    return () => { document.body.removeChild(script) }
-  }, [])
+    return () => {
+      if (document.body.contains(script)) document.body.removeChild(script)
+    }
+  }, [onError])
 
   const handlePayment = async () => {
     if (!scriptLoaded) {
-      onError?.('Payment gateway loading, please wait a moment.')
+      onError?.(scriptError ? 'Payment gateway failed to load. Please refresh.' : 'Payment gateway loading, please wait a moment.')
       return
     }
     setLoading(true)
@@ -78,14 +88,15 @@ export default function RazorpayButton({
         },
       })
       rzp.open()
-    } catch {
+    } catch (err) {
       setLoading(false)
-      onError?.('Could not initiate payment. Please try again.')
+      const msg = err instanceof Error ? err.message : 'Could not initiate payment. Please try again.'
+      onError?.(msg)
     }
   }
 
   return (
-    <Button size="lg" className="w-full text-base" onClick={handlePayment} loading={loading}>
+    <Button size="lg" className="w-full text-base" onClick={handlePayment} loading={loading} disabled={scriptError}>
       {loading ? 'Processing...' : `Pay ₹${amountInr} with Razorpay`}
     </Button>
   )

@@ -11,11 +11,23 @@ export function useTemplates(filters: TemplateFilters = {}) {
       try {
         return await fetchTemplates(filters as Record<string, string | number>)
       } catch {
-        // Filter by occasion if specified; fall back to all mock templates if none match
-        const byOccasion = filters.occasion
+        // Apply all filters locally against mock data
+        let items = filters.occasion
           ? MOCK_TEMPLATES.filter(t => t.occasion_slug === filters.occasion)
-          : MOCK_TEMPLATES
-        const items = byOccasion.length > 0 ? byOccasion : MOCK_TEMPLATES.slice(0, 12)
+          : [...MOCK_TEMPLATES]
+
+        if (filters.style?.length) {
+          const styleSet = filters.style
+          items = items.filter(t => styleSet.some(s => t.style_tags.includes(s)))
+        }
+        if (filters.orientation) {
+          items = items.filter(t => t.orientation === filters.orientation)
+        }
+        if (filters.price_max !== undefined) {
+          items = items.filter(t => t.price_inr <= (filters.price_max as number))
+        }
+
+        if (!items.length) items = MOCK_TEMPLATES.slice(0, 12)
         return { items, total: items.length, page: 1, per_page: 20 }
       }
     },
