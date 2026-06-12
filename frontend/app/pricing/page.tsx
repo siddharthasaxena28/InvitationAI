@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { PRICING_TIERS } from '@/components/Checkout/PricingTiers'
+import { PRICING_TIERS } from '@/lib/pricing'
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
